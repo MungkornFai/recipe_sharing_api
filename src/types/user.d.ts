@@ -4,4 +4,9 @@ type UserSignUp = {
   password: string;
 };
 
-export { UserSignUp };
+type Query = {
+  filter: string;
+  values: string
+}
+
+export { UserSignUp, Query };

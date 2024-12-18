@@ -11,3 +11,16 @@ export const CreateUserSchema = z.object({
     .nonempty("password is require")
     .min(6, "Password must be at least 6 characters long"),
 });
+
+export const Query = z.object({
+  filter: z
+    .string({
+      message: "filter must be a string",
+    })
+    .optional(),
+  values: z
+    .string({
+      message: "values must be a string",
+    })
+    .optional(),
+});

@@ -3,8 +3,8 @@ import { timestamps } from "../lib/colums.helpers";
 
 export const users = pgTable("users", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  username: varchar("username", { length: 50 }),
-  email: varchar("email", { length: 50 }).notNull().unique(),
-  password: varchar("password", { length: 30 }).notNull(),
+  username: varchar("username", { length: 256 }).notNull(),
+  email: varchar("email", { length: 256 }).notNull().unique(),
+  password: varchar("password", { length: 256 }).notNull(),
   ...timestamps,
 });
