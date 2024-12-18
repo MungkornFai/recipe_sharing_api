@@ -3,7 +3,7 @@ import { db } from "../db/index";
 import { users } from "../db/schema/users";
 import { eq } from "drizzle-orm";
 import bcryptjs from "bcryptjs";
-import { User } from "../types/user";
+import { User, UserModification } from "../types/user";
 
 // create a new user and add it to the database
 export async function signUp(user: UserSignUp) {
@@ -72,5 +72,25 @@ export async function getUserById(id: number): Promise<User | null> {
   } catch (error) {
     console.log(`Error fetching user by id ${id}`, error);
     throw new Error(`Error fetching user by id ${id}`);
+  }
+}
+
+// update user with id in the database
+
+export async function updateUser(id: number, user: UserModification) {
+  try {
+    const updatedUser = await db
+      .update(users)
+      .set({
+        username: user.username,
+        email: user.email,
+        password: user.password,
+        updated_at: new Date(),
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return updatedUser[0];
+  } catch (error) {
+    console.log(`can not update user with id ${id}`, error);
   }
 }

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import { UserSignUp, Query } from "../types/user";
+import { UserSignUp, Query, UserModification } from "../types/user";
 import { signUp } from "../services";
-import { getUserById, getUsers } from "../services/user.service";
+import { getUserById, getUsers, updateUser } from "../services/user.service";
 
 // route handlers for creating user
 export async function userHandlerPost(
@@ -63,5 +63,32 @@ export async function userHandleGetUserById(
     res.status(200).json({ message: "User fetched successfully", user });
   } catch (error) {
     res.status(500).json({ message: "Error fetching user", error });
+  }
+}
+
+// route handlers for updating user by id
+
+export async function userHandlerUserUpdate(
+  req: Request<{ id: number }, {}, UserModification>,
+  res: Response
+) {
+  const body = req.body;
+  const { id } = req.params;
+  try {
+    if (isNaN(id)) {
+      res.status(400).json({ message: "Invalid user ID" });
+      return;
+    }
+
+    const updatedUser = await updateUser(id, body);
+    if (!updatedUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    res
+      .status(200)
+      .json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: "Error updating user", error });
   }
 }
