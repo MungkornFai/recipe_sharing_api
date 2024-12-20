@@ -5,10 +5,15 @@ type User = {
   password: string;
   created_at: Date;
   updated_at: Date | null;
-}
+};
 
 type UserSignUp = {
   username: string;
+  email: string;
+  password: string;
+};
+
+type UserSignIn = {
   email: string;
   password: string;
 };
@@ -19,11 +24,11 @@ type UserModification = {
   password?: string;
   created_at?: Date | null;
   updated_at?: Date | null;
-}
+};
 
 type Query = {
   filter: string;
-  values: string
-}
+  values: string;
+};
 
-export { UserSignUp, Query,User,UserModification };
+export { UserSignUp, Query, User, UserModification, UserSignIn };

@@ -2,17 +2,20 @@ import { Router, Request, Response } from "express";
 import {
   userHandleGet,
   userHandlerPost,
-  userHandleGetUserById,
-  userHandlerUserUpdate
+  userHandleGetUserProfile,
+  userHandlerUserUpdate,
+  userHandlerUserSignIn,
 } from "../controllers/user.controller";
 import { validate } from "../middlewares/validate";
-import { CreateUserSchema,UserModificationSchema, Query } from "../schemas/user.schema";
+import { CreateUserSchema, UserModificationSchema, UserSignInSchema } from "../schemas/user.schema";
+import { authenticatToken } from "../middlewares/validate.user.token";
 
 const router = Router();
 
 router.get("/", userHandleGet);
-router.get("/:id", userHandleGetUserById);
+router.get("/profile",authenticatToken, userHandleGetUserProfile);
 router.patch("/:id", validate(UserModificationSchema, "body"), userHandlerUserUpdate);
 router.post("/signup", validate(CreateUserSchema, "body"), userHandlerPost);
+router.post("/signin", validate(UserSignInSchema, "body"), userHandlerUserSignIn);
 
 export default router;

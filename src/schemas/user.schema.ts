@@ -28,6 +28,13 @@ export const UserModificationSchema = z.object({
     .min(6, "Password must be at least 6 characters long")
     .optional(),
 });
+export const UserSignInSchema = z.object({
+  email: z.string().nonempty("email is require").email("Invalid email address"),
+  password: z
+    .string()
+    .nonempty("password is require")
+    .min(6, "Password must be at least 6 characters long"),
+});
 
 export const Query = z.object({
   filter: z
