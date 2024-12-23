@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { UserSignUp, Query, UserModification, UserSignIn } from "../types/user";
-import { signUp } from "../services/user.service";
+import { deleteUserById, signUp } from "../services/user.service";
 import { getUserById, getUsers, signIn, updateUser } from "../services/user.service";
 import jwt from "jsonwebtoken";
 import { decodeToken } from "../lib/session.token";
+import { sendError, sendSuccess } from "../lib/response";
 
 // route handlers for creating user
-export async function userHandlerPost(
+export async function createUserHandler(
   req: Request<{}, {}, UserSignUp>,
   res: Response,
   next: NextFunction
@@ -14,10 +15,12 @@ export async function userHandlerPost(
   const body = req.body;
   try {
     const user = await signUp(body);
-    return res.status(201).json({ message: "User registered successfully", user });
+    res.status(201).json({ message: "User registered successfully", user });
+    return;
   } catch (error) {
     if (error instanceof Error) {
-      res.status(409).json({ message: error.message });
+      next(error);
+      return;
     }
     res.status(500).json({
       message: "Server error",
@@ -35,9 +38,9 @@ export async function userHandleGet(req: Request<{}, {}, {}, Query>, res: Respon
       return;
     }
     const users = await getUsers();
-    res.status(200).json({ message: "Users fetched successfully", users });
+    sendSuccess(res, "Users fetched successfully", users, 200);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching users", error });
+    sendError(res, "Error fetching users", 500, error);
   }
 }
 
@@ -86,25 +89,39 @@ export async function userHandlerUserUpdate(
 
 // route handlers for user sign in
 
-export async function userHandlerUserSignIn(req: Request<{}, {}, UserSignIn>, res: Response) {
+export async function userHandlerUserSignIn(
+  req: Request<{}, {}, UserSignIn>,
+  res: Response,
+  next: NextFunction
+) {
   const body = req.body;
   try {
     const user = await signIn(body);
-    if (!user) {
-      res.status(404).json({
-        message: "Failed to sign in",
-      });
-      return;
-    }
     res.cookie("token", user.token, {
       httpOnly: true,
       maxAge: 360000,
     });
-    res.status(200).json({
-      message: "Signed in successfully",
-      user,
-    });
+    sendSuccess(res, "User signed in successfully", user, 201);
   } catch (error: any) {
-    res.status(500).json({ message: "Error signing in", error });
+    if (error instanceof Error) {
+      next(error);
+    }
+    sendError(res, "Error signing in user", 500, error);
+  }
+}
+
+
+export async function userHandlerDeleteUser(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.params;
+  const parsedId = parseInt(id);
+  try {
+    const user = await deleteUserById(parsedId);
+    if (!user) {
+      sendError(res, "User not found", 404);
+      return;
+    }
+    sendSuccess(res, "User deleted successfully", user, 200);
+  } catch (error) {
+    next(error);
   }
 }
