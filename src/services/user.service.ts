@@ -6,6 +6,9 @@ import bcryptjs from "bcryptjs";
 import { User, UserModification, UserSignIn } from "../types/user";
 import jwt from "jsonwebtoken";
 import { AppError, AuthenticationError, ConflictError } from "../lib/error.handlers";
+import { generateToken } from "../lib/session.token";
+import { config } from "../config/config";
+import transporter from "../config/nodemailer";
 
 // use sign in with password and email
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -15,23 +18,20 @@ export async function signIn(user: UserSignIn) {
     const findUser = await db.select().from(users).where(eq(users.email, user.email));
     if (findUser.length === 0) {
       //console.log("No users found")
-      throw new AuthenticationError("No users found", 404);
+      throw new Error("No users found");
     }
     const { password, id } = findUser[0];
     const isPasswordMatch = await bcryptjs.compare(user.password, password);
     if (!isPasswordMatch) {
       throw new Error("password Not match");
     }
-
-    const payload = {
-      userId: id,
-    };
-    const token = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = generateToken(id);
     return { token };
   } catch (error) {
-    console.log(error);
+    console.log("Error during sign in", error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
     throw error;
   }
 }
@@ -45,11 +45,13 @@ export async function signUp(user: UserSignUp) {
     if (findUser.length > 0) {
       throw new Error("User already exists");
     }
+    const confirmationToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1d" });
     const newUser = await db
       .insert(users)
       .values({
         username,
         email,
+        confirmToken: confirmationToken,
         password: passwordHashed,
       })
       .returning();
@@ -116,5 +118,17 @@ export async function updateUser(id: number, user: UserModification) {
     return updatedUser[0];
   } catch (error) {
     console.log(`can not update user with id ${id}`, error);
+  }
+}
+
+export async function deleteUserById(id: number) {
+  try {
+    const deletedUser = await db.delete(users).where(eq(users.id, id)).returning();
+    if (deletedUser.length === 0) {
+      return null;
+    }
+    return deletedUser[0];
+  } catch (error) {
+    throw error;
   }
 }

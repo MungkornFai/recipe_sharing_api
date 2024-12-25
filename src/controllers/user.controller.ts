@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { UserSignUp, Query, UserModification, UserSignIn } from "../types/user";
+import { UserSignUp, Query, UserModification, UserSignIn, IdParam } from "../types/user";
 import { deleteUserById, signUp } from "../services/user.service";
 import { getUserById, getUsers, signIn, updateUser } from "../services/user.service";
 import jwt from "jsonwebtoken";
@@ -53,10 +53,10 @@ export async function userHandleGetUserProfile(req: Request, res: Response) {
   try {
     const user = await getUserById(userId);
     if (!user) {
-      res.status(404).json({ message: "User not found" });
+      sendError(res, "User not found", 404);
       return;
     }
-    res.status(200).json({ message: "User fetched successfully", user });
+    sendSuccess(res, "User fetched successfully", user, 200);
   } catch (error) {
     res.status(500).json({ message: "Error fetching user", error });
   }
@@ -65,25 +65,26 @@ export async function userHandleGetUserProfile(req: Request, res: Response) {
 // route handlers for updating user by id
 
 export async function userHandlerUserUpdate(
-  req: Request<{ id: number }, {}, UserModification>,
-  res: Response
+  req: Request<IdParam, {}, UserModification>,
+  res: Response,
+  next: NextFunction
 ) {
   const body = req.body;
-  const { id } = req.params;
+  const userId = req.params.id;
   try {
-    if (isNaN(id)) {
-      res.status(400).json({ message: "Invalid user ID" });
+    if (isNaN(userId)) {
+      sendError(res, "Invalid user id", 400);
       return;
     }
 
-    const updatedUser = await updateUser(id, body);
+    const updatedUser = await updateUser(userId, body);
     if (!updatedUser) {
-      res.status(404).json({ message: "User not found" });
+      sendError(res, "User not found", 404);
       return;
     }
     res.status(200).json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
-    res.status(500).json({ message: "Error updating user", error });
+    next(error);
   }
 }
 
@@ -106,10 +107,9 @@ export async function userHandlerUserSignIn(
     if (error instanceof Error) {
       next(error);
     }
-    sendError(res, "Error signing in user", 500, error);
+    next(error);
   }
 }
-
 
 export async function userHandlerDeleteUser(req: Request, res: Response, next: NextFunction) {
   const { id } = req.params;

@@ -4,7 +4,7 @@ import { UserSignUp } from "../types/user";
 
 export const validate =
   (schema: ZodSchema, type: "body" | "query" | "params") =>
-  (req: Request<{}, {}, UserSignUp>, res: Response, next: NextFunction) => {
+  (req: Request, res: Response, next: NextFunction) => {
     let dataToValidate;
     switch (type) {
       case "body":
@@ -33,3 +33,20 @@ export const validate =
         .json({ message: "Something went wrong", error: error.message });
     }
   };
+
+  // export const validate =
+  //   (schema: ZodSchema, target: "body" | "params" | "query" = "body") =>
+  //   (req: Request, res: Response, next: NextFunction) => {
+  //     const validationResult = schema.safeParse(req[target]);
+
+  //     if (!validationResult.success) {
+  //       const errors = validationResult.error.errors.map((err) => ({
+  //         path: err.path.join("."),
+  //         message: err.message,
+  //       }));
+  //       return sendError(res, "Validation failed", 400, errors);
+  //     }
+
+  //     req[target] = validationResult.data;
+  //     next();
+  //   };

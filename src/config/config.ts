@@ -1,5 +1,13 @@
+import dotenv from "dotenv";
+import path from "path";
+
+dotenv.config({path: path.resolve(__dirname, "../../.env")});
+
 export const config = {
-    port: process.env.PORT || 3000,
-    jwtSecret: process.env.JWT_SECRET || "your_secret_key",
-    databaseUrl: process.env.DATABASE_URL || "your_database_url",
-}
+  emailUser: process.env.EMAIL_USER || "phaiyladsamee@gmail.com",
+  emailPass: process.env.EMAIL_PASS || "0@mGi?@Z",
+  port: process.env.PORT || 3000,
+  jwtSecret: process.env.JWT_SECRET,
+  databaseUrl: process.env.DATABASE_URL,
+  host: process.env.HOST,
+};

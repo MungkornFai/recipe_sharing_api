@@ -22,13 +22,15 @@ type UserModification = {
   username?: string;
   email?: string;
   password?: string;
-  created_at?: Date | null;
-  updated_at?: Date | null;
 };
+
+type IdParam = {
+  id: number;
+}
 
 type Query = {
   filter: string;
   values: string;
 };
 
-export { UserSignUp, Query, User, UserModification, UserSignIn };
+export { UserSignUp, Query, User, UserModification, UserSignIn,IdParam };
