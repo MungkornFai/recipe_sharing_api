@@ -1,6 +1,3 @@
-
-
-
 type Recipe = {
   title: string;
   description: string;
@@ -19,9 +16,15 @@ type TComment = {
   comment: string;
   recipeId: number;
   userId: number;
-}
+};
+
+type TRating = {
+  rating: number;
+  recipeId: number;
+  userId: number;
+};
 type TRecipeParams = {
   id: string;
-}
+};
 
-export { Recipe,TQuery,TComment,TRecipeParams };
+export { Recipe, TQuery, TComment, TRecipeParams,TRating };

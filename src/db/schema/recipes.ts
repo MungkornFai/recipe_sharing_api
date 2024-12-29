@@ -35,23 +35,18 @@ export const commentRelations = relations(comments, ({ one }) => ({
   }),
 }));
 
-// export const likes = pgTable("likes", {
-//   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-//   recipeId: integer("recipe_id").references(() => recipes.id),
-//   userId: integer("user_id").references(() => users.id),
-//   ...timestamps,
-// })
 
-// export const ratings = pgTable("ratings", {
-//   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-//   rating: integer("rating").notNull(),
-//   recipeId: integer("recipe_id").references(() => recipes.id),
-//   userId: integer("user_id").references(() => users.id),
-//   ...timestamps,
-// })
+export const ratings = pgTable("ratings", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  rating: integer("rating").notNull(),
+  recipeId: integer("recipe_id").references(() => recipes.id),
+  userId: integer("user_id").references(() => users.id),
+  ...timestamps,
+})
 
-// export const tags = pgTable("tags", {
-//   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-//   name: varchar("name", { length: 256 }).notNull(),
-//   ...timestamps,
-// })
+export const favorites = pgTable("favorites", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  recipeId: integer("recipe_id").references(() => recipes.id, { onDelete: "cascade" }), // Delete favorites when recipe is deleted
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }), // Delete favorites when user is deleted
+  ...timestamps,
+})

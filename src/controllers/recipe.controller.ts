@@ -1,11 +1,12 @@
 import type { Request, Response, NextFunction } from "express";
 
-import { Recipe, TQuery, TComment, TRecipeParams } from "../types/recipe";
+import { Recipe, TQuery, TComment, TRecipeParams, TRating } from "../types/recipe";
 import { sendError, sendSuccess } from "../lib/response";
 import { db } from "../db";
-import { recipes, comments, commentRelations } from "../db/schema/recipes";
-import { eq, like, and } from "drizzle-orm";
+import { recipes, comments, commentRelations, ratings, favorites } from "../db/schema/recipes";
+import { eq, like, and, relations } from "drizzle-orm";
 import { d } from "drizzle-kit/index-Z-1TKnbX";
+import { users } from "../db/schema/users";
 
 export async function handlerRecipeCreate(
   req: Request<{}, {}, Recipe>,
@@ -36,8 +37,7 @@ export async function handlerRecipeGetAll(req: Request, res: Response, next: Nex
   }
 }
 
-// get all recipes for specific user
-
+// function handler for getting a recipe by id
 export async function handlerRecipeGetById(req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.user || !req.user.userId) {
@@ -61,7 +61,7 @@ export async function handlerRecipeGetById(req: Request, res: Response, next: Ne
     next(error);
   }
 }
-
+// function handler for searching recipes
 export async function handleSearchRecipe(
   req: Request<{}, {}, {}, TQuery>,
   res: Response,
@@ -79,7 +79,7 @@ export async function handleSearchRecipe(
     next(error);
   }
 }
-
+// function handler for creating a comment
 export async function handlerRecipeComment(
   req: Request<TRecipeParams, {}, TComment>,
   res: Response,
@@ -100,9 +100,69 @@ export async function handlerRecipeComment(
         userId: req.user.userId,
       })
       .returning();
-    
-
     sendSuccess(res, "Comment created successfully", newComment, 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Add a handler for creating a rating for a recipe
+export async function handlerRecipeRating(
+  req: Request<TRecipeParams, {}, TRating>,
+  res: Response,
+  next: NextFunction
+) {
+  const body = req.body;
+  const recipeId = req.params.id;
+  try {
+    const newRate = await db
+      .insert(ratings)
+      .values({
+        rating: body.rating,
+        recipeId: parseInt(recipeId),
+        userId: req.user.userId,
+      })
+      .returning();
+
+    sendSuccess(res, "Rate created successfully", newRate, 201);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// function haddler for saving a recipe as favorite
+
+export async function handlerSaveToFavorite(
+  req: Request<TRecipeParams>,
+  res: Response,
+  next: NextFunction
+) {
+  const recipeId = parseInt(req.params.id);
+  try {
+    if (isNaN(recipeId)) {
+      sendError(res, "Invalid recipe ID", 400);
+    }
+    // const existingRecipe = await db.select().from(recipes).where(eq(recipes.id, recipeId));
+    // if (!existingRecipe) {
+    //   sendError(res, "Recipe not found", 404);
+    //   return;
+    // }
+    // const existingFavorite = await db
+    //   .select()
+    //   .from(favorites)
+    //   .where(eq(favorites.recipeId, recipeId));
+    // if (existingFavorite) {
+    //   sendError(res, "Recipe already saved to favorite", 400);
+    //   return;
+    // }
+    const newFavorite = await db
+      .insert(favorites)
+      .values({
+        recipeId: recipeId,
+        userId: req.user.userId,
+      })
+      .returning();
+    sendSuccess(res, "Recipe saved to favorite successfully", newFavorite, 201);
   } catch (error) {
     next(error);
   }

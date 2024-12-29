@@ -19,8 +19,20 @@ export const CreateRecipeSchema = z.object({
     .nonempty("Instructions are required")
     .min(10, "Instructions must be at least 10 characters long"),
   photos: z.array(z.string().url("Invalid URL format")).optional(),
-
 });
 
+export const CommentSchema = z.object({
+  comment: z
+    .string()
+    .nonempty("Comment is required")
+    .min(3, "Comment must be at least 3 characters long"),
+});
+
+export const RatingSchema = z.object({
+  rating: z.number().int().min(1).max(5, { message: "Rating must be between 1 and 5" }),
+});
+export const FavoriteIdParamsSchema = z.object({
+ id: z.coerce.number().int().positive("Invalid recipe ID"),
+});
 
 export type Recipe = z.infer<typeof CreateRecipeSchema>;
