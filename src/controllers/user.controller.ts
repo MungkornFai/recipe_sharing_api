@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { UserSignUp, Query, UserModification, UserSignIn, IdParam } from "../types/user";
 import { deleteUserById, signUp } from "../services/user.service";
 import { getUserById, getUsers, signIn, updateUser } from "../services/user.service";
-import jwt from "jsonwebtoken";
 import { decodeToken } from "../lib/session.token";
 import { sendError, sendSuccess } from "../lib/response";
 

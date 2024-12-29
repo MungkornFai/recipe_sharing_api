@@ -10,4 +10,18 @@ type Recipe = {
   photos?: string[] | undefined;
 };
 
-export { Recipe };
+type TQuery = {
+  title?: string;
+  ingredients?: string;
+};
+
+type TComment = {
+  comment: string;
+  recipeId: number;
+  userId: number;
+}
+type TRecipeParams = {
+  id: string;
+}
+
+export { Recipe,TQuery,TComment,TRecipeParams };

@@ -16,7 +16,7 @@ app.use(express.json());
 // Example Route
 
 app.use("/api/users", userRouter);
-app.use("/api/recipes", recipeRouter);
+app.use("/api", recipeRouter);
 
 
 // error handler
