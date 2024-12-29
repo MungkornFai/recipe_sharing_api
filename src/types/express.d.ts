@@ -6,7 +6,7 @@ type UserId = {
 declare global {
     namespace Express {
         interface Request {
-        userId?: UserId;
+        user: UserId;
         }
     }
 }
