@@ -35,4 +35,9 @@ export const FavoriteIdParamsSchema = z.object({
  id: z.coerce.number().int().positive("Invalid recipe ID"),
 });
 
+
+export const FollowSchema = z.object({
+  followeeId: z.coerce.number().int().positive("Invalid followee ID"),
+})
+
 export type Recipe = z.infer<typeof CreateRecipeSchema>;

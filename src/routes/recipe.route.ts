@@ -29,6 +29,7 @@ router.post("/recipes",authenticatToken,validate(CreateRecipeSchema, "body"),han
 router.get("/recipes/:id", authenticatToken, handlerRecipeGetById);
 router.post("/recipes/:id/comment",authenticatToken,validate(CommentSchema, "body"),handlerRecipeComment);
 router.post("/recipes/:id/rating",authenticatToken,validate(RatingSchema, "body"),handlerRecipeRating);
-router.post("/recipes/:id/favorite",authenticatToken,validate(FavoriteIdParamsSchema, "params"),handlerSaveToFavorite);
+router.post("/recipes/:id/favorite", authenticatToken, validate(FavoriteIdParamsSchema, "params"), handlerSaveToFavorite);
+
 
 export default router;

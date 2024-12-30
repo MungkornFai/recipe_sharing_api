@@ -25,7 +25,7 @@ type UserModification = {
 };
 
 type IdParam = {
-  id: number;
+  id: string;
 }
 
 type Query = {

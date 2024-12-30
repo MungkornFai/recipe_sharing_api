@@ -27,4 +27,13 @@ type TRecipeParams = {
   id: string;
 };
 
-export { Recipe, TQuery, TComment, TRecipeParams,TRating };
+type TUserParams = {
+  followeeId: string;
+}
+
+type TFollower = {
+  followerId: number;
+  followeeId: number;
+}
+
+export { Recipe, TQuery, TComment, TRecipeParams,TRating,TUserParams,TFollower };

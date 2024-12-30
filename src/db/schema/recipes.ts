@@ -50,3 +50,10 @@ export const favorites = pgTable("favorites", {
   userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }), // Delete favorites when user is deleted
   ...timestamps,
 })
+
+export const follows = pgTable("follows", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  followerId: integer("follower_id").references(() => users.id, { onDelete: "cascade" }), // Delete follows when user is deleted
+  followeeId: integer("following_id").references(() => users.id, { onDelete: "cascade" }), // Delete follows when user is deleted
+  ...timestamps,
+})

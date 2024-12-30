@@ -4,6 +4,9 @@ import { deleteUserById, signUp } from "../services/user.service";
 import { getUserById, getUsers, signIn, updateUser } from "../services/user.service";
 import { decodeToken } from "../lib/session.token";
 import { sendError, sendSuccess } from "../lib/response";
+import { TUserParams } from "../types/recipe";
+import { follows } from "../db/schema/recipes";
+import { db } from "../db";
 
 // route handlers for creating user
 export async function createUserHandler(
@@ -69,7 +72,7 @@ export async function userHandlerUserUpdate(
   next: NextFunction
 ) {
   const body = req.body;
-  const userId = req.params.id;
+  const userId = parseInt(req.params.id);
   try {
     if (isNaN(userId)) {
       sendError(res, "Invalid user id", 400);
@@ -120,6 +123,32 @@ export async function userHandlerDeleteUser(req: Request, res: Response, next: N
       return;
     }
     sendSuccess(res, "User deleted successfully", user, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// function handler for user follow
+export async function handlerUserFollow(
+  req: Request<TUserParams>,
+  res: Response,
+  next: NextFunction
+) {
+  const followeeId = parseInt(req.params.followeeId);
+  try {
+    if (isNaN(followeeId)) {
+      sendError(res, "Invalid followee ID", 400);
+      return;
+    }
+    if (req.user.userId === followeeId) {
+      sendError(res, "You can't follow yourself", 400);
+      return;
+    }
+    await db.insert(follows).values({
+      followerId: req.user.userId,
+      followeeId: followeeId,
+    })
+    sendSuccess(res, "User followed successfully", 201);
   } catch (error) {
     next(error);
   }
